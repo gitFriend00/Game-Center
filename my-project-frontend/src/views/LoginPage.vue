@@ -14,7 +14,8 @@
                   prepend-inner-icon="mdi-account" label="Username" />
                 <v-text-field v-model="loginObj.Password" variant="outlined" density="compact" label="Password"
                   prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" hide-details/>
+                  :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword"
+                  hide-details />
               </v-card-text>
               <v-card-actions class="pl-4 pr-4">
                 <v-row>
@@ -36,16 +37,18 @@
               <v-img class="mt-8" height="120" src="logo.png"></v-img>
 
               <v-card-text>
-                <v-autocomplete v-model="UserObj.Role" :items="role" variant="outlined" density="compact" label="Role" clearable />
-                <v-text-field prepend-inner-icon="mdi-account" v-model="UserObj.UserName" variant="outlined" density="compact"
-                  label="UserName" />
-                  <v-text-field v-model="UserObj.Password" variant="outlined" density="compact" label="Password"
+                <v-autocomplete v-model="UserObj.Role" :items="role" variant="outlined" density="compact" label="Role"
+                  clearable />
+                <v-text-field prepend-inner-icon="mdi-account" v-model="UserObj.UserName" variant="outlined"
+                  density="compact" label="UserName" />
+                <v-text-field v-model="UserObj.Password" variant="outlined" density="compact" label="Password"
                   prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" hide-details/>
+                  :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword"
+                  hide-details />
               </v-card-text>
               <v-card-actions class="pl-4 pr-4">
                 <v-row>
-                    <v-col cols="6"> <v-btn block variant="elevated" color="warning"
+                  <v-col cols="6"> <v-btn block variant="elevated" color="warning"
                       @click="isRegister = false; UserObj = {}">Back</v-btn></v-col>
                   <v-col cols="6"> <v-btn block variant="elevated" color="success" @click="signupUser()">Sign
                       Up</v-btn></v-col>
@@ -80,7 +83,7 @@ export default {
   methods: {
     async login() {
 
-        console.log('Username:'+ this.loginObj.UserName, 'Password:'+ this.loginObj.Password)
+      console.log('Username:' + this.loginObj.UserName, 'Password:' + this.loginObj.Password)
       let checkExisting = await api.get(`User/getSpecificUser/${this.loginObj.UserName}/${this.loginObj.Password}`)
 
       if (checkExisting.data.length > 0) {
@@ -175,7 +178,7 @@ export default {
         }
       });
     },
-    
+
   },
 }
 </script>

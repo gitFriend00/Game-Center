@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useMainStore } from './stores'
 import { useRouter } from 'vue-router'
 
@@ -70,23 +70,50 @@ const router = useRouter()
 const drawer = ref(false)
 const loading = ref(false)
 
-const navItems = [
-  {
-    title: 'Home',
-    icon: 'mdi-home',
-    to: '/'
-  },
-  {
-    title: 'GameCenter',
-    icon: 'mdi-cart',
-    to: '/gamecenter'
-  },
-  {
+const navItems = computed(() => {
+  const role = store.$state.userInformation.Role
+  const isCustomer = role === 'Customer'
+  const isAdmin = role === 'Admin'
+  const items = [
+    {
+      title: 'Home',
+      icon: 'mdi-home',
+      to: '/'
+    }
+  ]
+
+  if (isAdmin) {
+    items.push({
+      title: 'GameCenter',
+      icon: 'mdi-cart',
+      to: '/gamecenter'
+    })
+  }
+
+  if (isAdmin) {
+    items.push({
+      title: 'User Management',
+      icon: 'mdi-account-group',
+      to: '/usermanagement'
+    })
+  }
+
+  if (isCustomer) {
+    items.push({
+      title: 'Store',
+      icon: 'mdi-store',
+      to: '/store'
+    })
+  }
+
+  items.push({
     title: 'About',
     icon: 'mdi-information',
     to: '/about'
-  },
-]
+  })
+
+  return items
+})
 
 async function functionLoad(item) {
   console.log(item, 'item')
