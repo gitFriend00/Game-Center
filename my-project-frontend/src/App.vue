@@ -2,7 +2,7 @@
   <v-app>
     <!-- App Bar -->
     <v-app-bar color="primary" density="comfortable" class="align-center"
-      v-if="store.$state.userInformation.EmployeeCode != undefined">
+      v-if="store.$state.userInformation.UserName != undefined">
       <button class="setting-btn ml-5 mr-2" @click="drawer = !drawer">
         <span class="bar bar1"></span>
         <span class="bar bar2"></span>
@@ -28,11 +28,11 @@
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" permanent
-      v-if="store.$state.userInformation.EmployeeCode != undefined">
+      v-if="store.$state.userInformation.UserName != undefined">
       <v-list>
-      <v-list-item>{{ store.userInformation.DepartmentName }}</v-list-item>
+      <v-list-item>Console.Org</v-list-item>
         <v-list-item 
-          :title="`${store.userInformation.EmployeeName.split(' ')[0]}`" :subtitle="`${store.userInformation.TeamName}`">
+          :title="`${store.userInformation.UserName}`" :subtitle="`${store.userInformation.Role}`">
           <template v-slot:prepend>
             <v-avatar>
             </v-avatar>

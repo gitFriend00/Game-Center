@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { getSpecificEmployee } = require("../controllers/EmployeesController");
+const { getSpecificUser } = require("../controllers/UserController");
 
-router.get("/getSpecificEmployee/:EmployeeCode/:Password", getSpecificEmployee);
+router.get("/getSpecificUser/:UserName/:Password", getSpecificUser);
 
 module.exports = router;

@@ -14,7 +14,7 @@ const route = require('./routes/couchAPI')
 const Gameroute = require('./routes/gameApi')
 //api
 
-app.use('/Employees',route)
+app.use('/User',route)
 app.use('/Game',Gameroute)
 
 

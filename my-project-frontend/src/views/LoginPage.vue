@@ -2,16 +2,15 @@
   <div class="bg-primary">
     <v-container class="fill-height d-flex align-center justify-center">
       <center>
-        <v-card color="compliment" style="border: 1px solid black" width="450px" height="520px">
+        <v-card color="compliment" style="border: 1px solid black" width="370px" height="420px">
 
           <transition name="flip" mode="out-in">
 
             <div v-if="!isRegister" key="login">
-              <v-img class="mt-8" height="180" src="management.png"></v-img>
-              <br />
-              <br />
+              <v-img class="mt-8" height="180" src="logo.png"></v-img>
+
               <v-card-text>
-                <v-text-field v-model="loginObj.UserCode" variant="outlined" density="compact"
+                <v-text-field v-model="loginObj.UserName" variant="outlined" density="compact"
                   prepend-inner-icon="mdi-account" label="Username" />
                 <v-text-field v-model="loginObj.Password" variant="outlined" density="compact" label="Password"
                   prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -34,18 +33,11 @@
 
             <div v-else>
 
-              <v-img v-if="EmployeeObj.EmployeeCode" class="mt-16" height="180" width="180px"
-                style="border:1px solid black; border-radius: 100%;" cover
-                :src="`http://hrd-adminweb/photos/${this.EmployeeObj.EmployeeCode}.jpg`">
-              </v-img>
-              <v-img v-else class="mt-10" height="180" src="management.png"></v-img>
+              <v-img class="mt-8" height="120" src="logo.png"></v-img>
 
-              <br />
               <v-card-text>
-                <v-text-field @keyup.enter="loadEmployeeData()" v-model="EmployeeCode" prepend-inner-icon="mdi-card-account-details" variant="outlined"
-                  density="compact" label="EmployeeCode" type="number" hide-spin-buttons />
-                <v-text-field readonly prepend-inner-icon="mdi-account" v-model="EmployeeObj.EmployeeName" variant="outlined" density="compact"
-                  label="EmployeeName" />
+                <v-text-field prepend-inner-icon="mdi-account" v-model="UserObj.UserName" variant="outlined" density="compact"
+                  label="UserName" />
                   <v-text-field variant="outlined" density="compact" label="Password"
                   prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" hide-details/>
@@ -53,8 +45,8 @@
               <v-card-actions class="pl-4 pr-4">
                 <v-row>
                   <v-col cols="6"> <v-btn block variant="elevated" color="warning"
-                      @click="isRegister = false, EmployeeObj = {}, EmployeeCode = ''">Back</v-btn></v-col>
-                  <v-col cols="6"> <v-btn block variant="elevated" color="success" @click="signupEmployee()">Sign
+                      @click="isRegister = false, UserObj = {}, UserName = ''">Back</v-btn></v-col>
+                  <v-col cols="6"> <v-btn block variant="elevated" color="success" @click="signupUser()">Sign
                       Up</v-btn></v-col>
                 </v-row>
               </v-card-actions>
@@ -78,24 +70,21 @@ export default {
     return {
       showPassword: false,
       isRegister: false,
-      EmployeeCode: '',
-      EmployeeObj: {},
+      UserObj: {},
       storedData: useMainStore(),
       loginObj: {},
     }
   },
   methods: {
     async login() {
-      // let checkExisting = this.storedData.$state.employees.filter((item) => {
-      //   return item.EmployeeCode === this.loginObj.UserCode && item.EmployeeCode === this.loginObj.Password
-      // })
-        console.log('Username:'+ this.loginObj.UserCode, 'Password:'+ this.loginObj.Password)
-      let checkExisting = await api.get(`Employees/getSpecificEmployee/${this.loginObj.UserCode}/${this.loginObj.Password}`)
+
+        console.log('Username:'+ this.loginObj.UserName, 'Password:'+ this.loginObj.Password)
+      let checkExisting = await api.get(`User/getSpecificUser/${this.loginObj.UserName}/${this.loginObj.Password}`)
 
       if (checkExisting.data.length > 0) {
         this.storedData.$state.userInformation = checkExisting.data[0]
         setTimeout(() => {
-          this.$router.push('/employees')
+          this.$router.push('/gamecenter')
         }, 800);
 
       } else {
@@ -107,22 +96,14 @@ export default {
           timer: 500
         });
 
-        this.EmployeeObj = {}
-        this.EmployeeCode = ''
+        this.UserObj = {}
+        this.UserCode = ''
       }
     },
 
-    async loadEmployeeData() {
-      if (!this.EmployeeCode) return
 
-      let result = await axios.get(`http://hrdapps79:9999/sharedAPI/getEmployeeCode/${this.EmployeeCode}`)
-      if (result.data) {
-        this.EmployeeObj = result.data[0]
-      }
-    },
-
-    async signupEmployee() {
-      if (!this.EmployeeObj.EmployeeName) {
+    async signupUser() {
+      if (!this.UserObj.UserName) {
         Swal.fire({
           position: "center",
           toast: true,
@@ -144,8 +125,8 @@ export default {
           confirmButtonText: "Yes, confirm!"
         }).then((result) => {
           if (result.isConfirmed) {
-            let checkExisting = this.storedData.$state.employees.filter((item) => {
-              return item.EmployeeCode === this.EmployeeCode
+            let checkExisting = this.storedData.$state.user.filter((item) => {
+              return item.UserName === this.UserName
             })
 
             if (checkExisting.length > 0) {
@@ -156,10 +137,10 @@ export default {
                 showConfirmButton: false,
                 timer: 500
               });
-              this.EmployeeObj = {}
-              this.EmployeeCode = ''
+              this.UserObj = {}
+              this.UserCode = ''
             } else {
-              this.storedData.$state.employees.push(this.EmployeeObj)
+              this.storedData.$state.User.push(this.UserObj)
 
               Swal.fire({
                 toast: true,
@@ -170,8 +151,8 @@ export default {
               });
 
               this.isRegister = false
-              this.EmployeeObj = {}
-              this.EmployeeCode = ''
+              this.UserObj = {}
+              this.UserCode = ''
             }
           }
         });
