@@ -36,16 +36,17 @@
               <v-img class="mt-8" height="120" src="logo.png"></v-img>
 
               <v-card-text>
+                <v-autocomplete v-model="UserObj.Role" :items="role" variant="outlined" density="compact" label="Role" clearable />
                 <v-text-field prepend-inner-icon="mdi-account" v-model="UserObj.UserName" variant="outlined" density="compact"
                   label="UserName" />
-                  <v-text-field variant="outlined" density="compact" label="Password"
+                  <v-text-field v-model="UserObj.Password" variant="outlined" density="compact" label="Password"
                   prepend-inner-icon="mdi-lock" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showPassword ? 'text' : 'password'" @click:append-inner="showPassword = !showPassword" hide-details/>
               </v-card-text>
               <v-card-actions class="pl-4 pr-4">
                 <v-row>
-                  <v-col cols="6"> <v-btn block variant="elevated" color="warning"
-                      @click="isRegister = false, UserObj = {}, UserName = ''">Back</v-btn></v-col>
+                    <v-col cols="6"> <v-btn block variant="elevated" color="warning"
+                      @click="isRegister = false; UserObj = {}">Back</v-btn></v-col>
                   <v-col cols="6"> <v-btn block variant="elevated" color="success" @click="signupUser()">Sign
                       Up</v-btn></v-col>
                 </v-row>
@@ -73,6 +74,7 @@ export default {
       UserObj: {},
       storedData: useMainStore(),
       loginObj: {},
+      role: ['Customer', 'Admin'],
     }
   },
   methods: {
@@ -103,7 +105,7 @@ export default {
 
 
     async signupUser() {
-      if (!this.UserObj.UserName) {
+      if (!this.UserObj.UserName || !this.UserObj.Password || !this.UserObj.Role) {
         Swal.fire({
           position: "center",
           toast: true,
@@ -113,50 +115,65 @@ export default {
           timer: 500
         });
 
-      } else {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "You want to sign up?",
-          icon: "info",
-          toast: true,
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, confirm!"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            let checkExisting = this.storedData.$state.user.filter((item) => {
-              return item.UserName === this.UserName
-            })
-
-            if (checkExisting.length > 0) {
-              Swal.fire({
-                toast: true,
-                icon: "error",
-                title: "Already Exist",
-                showConfirmButton: false,
-                timer: 500
-              });
-              this.UserObj = {}
-              this.UserCode = ''
-            } else {
-              this.storedData.$state.User.push(this.UserObj)
-
-              Swal.fire({
-                toast: true,
-                icon: "success",
-                title: "signed up successfully",
-                showConfirmButton: false,
-                timer: 500
-              });
-
-              this.isRegister = false
-              this.UserObj = {}
-              this.UserCode = ''
-            }
-          }
-        });
+        return
       }
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to sign up?",
+        icon: "info",
+        toast: true,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, confirm!"
+      }).then(async (result) => {
+        if (!result.isConfirmed) return
+
+        const users = Array.isArray(this.storedData.$state.user) ? this.storedData.$state.user : []
+        const checkExisting = users.filter((item) => item.UserName === this.UserObj.UserName)
+
+        if (checkExisting.length > 0) {
+          Swal.fire({
+            toast: true,
+            icon: "error",
+            title: "Already Exist",
+            showConfirmButton: false,
+            timer: 500
+          });
+          this.UserObj = {}
+          return
+        }
+
+        try {
+          await api.post('User/createUser', this.UserObj)
+
+          if (Array.isArray(this.storedData.$state.user)) {
+            this.storedData.$state.user.push({ ...this.UserObj })
+          } else {
+            this.storedData.$state.user = [{ ...this.UserObj }]
+          }
+
+          Swal.fire({
+            toast: true,
+            icon: "success",
+            title: "signed up successfully",
+            showConfirmButton: false,
+            timer: 500
+          });
+
+          this.isRegister = false
+          this.UserObj = {}
+        } catch (error) {
+          Swal.fire({
+            toast: true,
+            icon: "error",
+            title: "Unable to sign up. Try again.",
+            showConfirmButton: false,
+            timer: 1000
+          });
+        }
+      });
     },
     
   },
